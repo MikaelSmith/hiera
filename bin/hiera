@@ -243,6 +243,19 @@ unless options[:verbose]
   Hiera.logger = "noop"
 end
 
+# Allow lookup of keys with or without prepended double colons
+options[:scope].default_proc = ->(hash, key) {
+  if key =~ /^::(.+)/
+    otherkey = $1
+  else
+    otherkey = "::%s" % key
+  end
+
+  if hash.include?(otherkey)
+    hash[key] = hash[otherkey]
+  end
+}
+
 ans = hiera.lookup(options[:key], options[:default], options[:scope], nil, options[:resolution_type])
 
 output_answer(ans, options[:format])
