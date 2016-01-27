@@ -307,6 +307,20 @@ class Hiera
 
       def qualified_lookup(segments, hash)
         value = hash
+	value.default_proc = ->(hash, key) {
+	  if key =~ /^::(.+)/
+	    otherkey =$1
+	  else
+	    otherkey = "::#{key}"
+	  end
+
+	  if hash.include?(otherkey)
+	    hash[key] = hash[otherkey]
+	  else
+	    hash[otherkey] = hash[key]
+	  end
+	}
+
         segments.each do |segment|
           throw :no_such_key if value.nil?
           if segment =~ /^[0-9]+$/
