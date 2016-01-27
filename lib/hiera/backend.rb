@@ -307,27 +307,18 @@ class Hiera
 
       def qualified_lookup(segments, hash)
         value = hash
-	value.default_proc = ->(hash, key) {
-	  if key =~ /^::(.+)/
-	    otherkey =$1
-	  else
-	    otherkey = "::#{key}"
-	  end
-
-	  if hash.include?(otherkey)
-	    hash[key] = hash[otherkey]
-	  else
-	    hash[otherkey] = hash[key]
-	  end
-	}
 
         segments.each do |segment|
-	  if segment =~ /osfam/
-	    puts ""
-	    puts "value of segment: #{segment}"
-	    puts "value of osfamily: #{value['osfamily']}"
-	    puts "value of ::osfamily: #{value['::osfamily']}"
+	  if segment =~ /^::(.+)/
+	    othersegment = $1
+	  else
+	    othersegment = "::%s" % segment
 	  end
+
+	  if value.include?(othersegment)
+	    value[segment] = value[othersegment]
+	  end
+
 	  throw :no_such_key if value.nil?
           if segment =~ /^[0-9]+$/
             segment = segment.to_i
