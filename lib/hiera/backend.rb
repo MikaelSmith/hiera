@@ -309,6 +309,7 @@ class Hiera
         value = hash
 
         segments.each do |segment|
+	  throw :no_such_key if value.nil?
 	  if segment =~ /^::(.+)/
 	    othersegment = $1
 	  else
@@ -319,7 +320,6 @@ class Hiera
 	    value[segment] = value[othersegment]
 	  end
 
-	  throw :no_such_key if value.nil?
           if segment =~ /^[0-9]+$/
             segment = segment.to_i
             raise Exception, "Hiera type mismatch: Got #{value.class.name} when Array was expected enable lookup using key '#{segment}'" unless value.instance_of?(Array)
