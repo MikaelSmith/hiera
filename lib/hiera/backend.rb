@@ -322,7 +322,13 @@ class Hiera
 	}
 
         segments.each do |segment|
-          throw :no_such_key if value.nil?
+	  if segment =~ /osfam/
+	    puts ""
+	    puts "value of segment: #{segment}"
+	    puts "value of osfamily: #{value['osfamily']}"
+	    puts "value of ::osfamily: #{value['::osfamily']}"
+	  end
+	  throw :no_such_key if value.nil?
           if segment =~ /^[0-9]+$/
             segment = segment.to_i
             raise Exception, "Hiera type mismatch: Got #{value.class.name} when Array was expected enable lookup using key '#{segment}'" unless value.instance_of?(Array)
